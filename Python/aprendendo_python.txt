@@ -1,0 +1,5 @@
+Em python podemos escrever códigos
+Em python podemos comprimentar uma pessoa
+Em python podemos verificar idades
+Em python podemos criar jogos
+Em python podemos criar IA's

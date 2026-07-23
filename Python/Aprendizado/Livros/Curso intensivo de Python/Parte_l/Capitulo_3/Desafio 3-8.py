@@ -1,0 +1,12 @@
+paises = ['Estados Unidos', 'Islândia', 'Coreia do Norte', 'Canadá', 'Ucrânia']
+print(paises)
+print(sorted(paises))
+print(paises)
+paises.reverse()
+print(paises)
+paises.reverse()
+print(paises)
+paises.sort()
+print(paises)
+paises.sort(reverse=True)
+print(paises)

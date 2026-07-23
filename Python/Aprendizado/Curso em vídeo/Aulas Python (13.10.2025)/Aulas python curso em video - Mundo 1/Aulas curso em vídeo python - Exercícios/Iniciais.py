@@ -1,0 +1,5 @@
+print('========Exercicio 1==========')
+print('Olá, Mundo')
+print('========Exercicio 2==========')
+nome=input('Digite seu nome')
+print('Prazer em te conhecer,',nome,'!')

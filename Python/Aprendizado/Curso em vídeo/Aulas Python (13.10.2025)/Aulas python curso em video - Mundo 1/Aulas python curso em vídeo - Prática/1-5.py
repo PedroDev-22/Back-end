@@ -1,0 +1,5 @@
+nome=input('Qual é o seu nome?')
+idade=input('Qual a sua idade?')
+peso=input('Qual o seu peso?')
+print('Então o seu nome é ',nome,' a sua idade é ',idade,' e o seu peso é ',peso,'. Certo?')
+print('É um grande prazer te conhecer!')
