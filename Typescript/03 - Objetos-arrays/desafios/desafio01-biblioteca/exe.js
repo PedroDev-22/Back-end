@@ -4,7 +4,7 @@ const emprestarLivro = (livro, usuario) => {
     if (livro.disponivel) {
         livro.disponivel = false;
         usuario.livrosEmprestados.push(livro.isbn);
-        return "Livro disponível";
+        return `Livro ${livro.titulo} emprestado para ${usuario.nome}`;
     }
     else {
         return "Livro indisponível";
@@ -14,12 +14,23 @@ const devolverLivro = (livro, usuario) => {
     if (!livro.disponivel) {
         livro.disponivel = true;
         const index = usuario.livrosEmprestados.indexOf(livro.isbn);
-        usuario.livrosEmprestados.splice(index, 1);
+        if (index !== -1) {
+            usuario.livrosEmprestados.splice(index, 1);
+        }
         return `Livro ${livro.titulo} devolvido`;
     }
     else {
         return `Livro ${livro.titulo} já está disponivel`;
     }
+};
+const listarLivroDisponiveis = (livros) => {
+    const disponiveis = livros.filter(livro => livro.disponivel);
+    const livrosDisponiveis = disponiveis.map(disponivel => disponivel.titulo);
+    return livrosDisponiveis;
+};
+const buscarLivro = (livros, titulo) => {
+    const livroEncontrado = livros.find(livro => livro.titulo.toLowerCase().includes(titulo.toLowerCase()));
+    return livroEncontrado;
 };
 // Livros
 const livro1 = {
@@ -64,3 +75,5 @@ const usuario3 = {
 };
 console.log(emprestarLivro(livro1, usuario2));
 console.log(devolverLivro(livro1, usuario2));
+console.log(listarLivroDisponiveis([livro1, livro2, livro3]));
+console.log(buscarLivro([livro1, livro2, livro3], "O programador pragmático"));

@@ -19,9 +19,9 @@ const emprestarLivro = (livro: Livro, usuario: Usuario): string => {
     if (livro.disponivel) {
         livro.disponivel = false;
         usuario.livrosEmprestados.push(livro.isbn);
-        return "Livro disponível";
+        return `Livro ${livro.titulo} emprestado para ${usuario.nome}`;
     } else {
-        return "Livro indisponível";
+       return "Livro indisponível";
     }
 }
 
@@ -29,13 +29,26 @@ const devolverLivro = (livro: Livro, usuario: Usuario): string => {
     if (!livro.disponivel) {
         livro.disponivel = true;
         const index = usuario.livrosEmprestados.indexOf(livro.isbn);
-        usuario.livrosEmprestados.splice(index, 1);
+        if (index !== -1) {
+            usuario.livrosEmprestados.splice(index, 1);
+        }
         return `Livro ${livro.titulo} devolvido`
     } else {
         return `Livro ${livro.titulo} já está disponivel`
     }
 }
 
+const listarLivroDisponiveis = (livros: Livro[]): string[] => {
+    const disponiveis: Livro[] = livros.filter(livro => livro.disponivel)
+    const livrosDisponiveis: string[] = disponiveis.map(disponivel => disponivel.titulo);
+
+    return livrosDisponiveis;
+}
+
+const buscarLivro = (livros: Livro[], titulo: string): Livro | undefined => {
+    const livroEncontrado = livros.find(livro => livro.titulo.toLowerCase().includes(titulo.toLowerCase()));
+    return livroEncontrado;
+}
 
 // Livros
 const livro1: Livro = {
@@ -55,7 +68,7 @@ const livro2: Livro = {
 }
 
 const livro3: Livro = {
-    isbn: "978-0201485677",
+    isbn: "978-201485658",
     titulo: "Refatoração",
     autor: "Martin Fowler",
     anoPublicacao: 2018,
@@ -86,3 +99,5 @@ const usuario3: Usuario = {
 
 console.log(emprestarLivro(livro1, usuario2));
 console.log(devolverLivro(livro1, usuario2));
+console.log(listarLivroDisponiveis([livro1, livro2, livro3]));
+console.log(buscarLivro([livro1, livro2, livro3], "O programador pragmático"))
