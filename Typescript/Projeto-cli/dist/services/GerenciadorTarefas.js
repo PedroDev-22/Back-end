@@ -1,36 +1,27 @@
 // Lógica de negócio
-
-import { Tarefa } from "../models/Tarefa.js";
-import { salvarTarefas, carregarTarefas } from '../utils/arquivo.js'
-
 export class GerenciadorTarefas {
-    private tarefas: Tarefa[];
-    private proximoId: number;
-
+    tarefas;
+    proximoId;
     constructor() {
         this.tarefas = [];
         this.proximoId = 1;
     }
-
-
-    adicionar(titulo: string, descricao: string): Tarefa {
-        const novaTarefa: Tarefa = {
+    adicionar(titulo, descricao) {
+        const novaTarefa = {
             id: this.proximoId,
             titulo,
             descricao,
             concluida: false,
             criadaEm: new Date(),
-        }
+        };
         this.proximoId++;
         this.tarefas.push(novaTarefa);
         return novaTarefa;
     }
-
-    listar(): Tarefa[] {
+    listar() {
         return [...this.tarefas];
     }
-
-    concluir(id: number): boolean {
+    concluir(id) {
         const tarefa = this.buscarPorId(id);
         if (tarefa) {
             tarefa.concluida = true;
@@ -38,25 +29,15 @@ export class GerenciadorTarefas {
         }
         return false;
     }
-
-    remover(id: number): boolean {
+    remover(id) {
         const tarefasIniciais = this.tarefas.length;
         this.tarefas = this.tarefas.filter((tarefa) => tarefa.id !== id);
         return tarefasIniciais !== this.tarefas.length;
     }
-
-    buscarPorId(id: number): Tarefa | undefined {
+    buscarPorId(id) {
         return this.tarefas.find((tarefa) => tarefa.id === id);
     }
 }
-
 const tasks = new GerenciadorTarefas();
-tasks.adicionar("teste", "teste para adicionar");
-tasks.adicionar("teste2", "teste 2 para adicionar");
-const tasksTarefas = tasks.listar();
-
-salvarTarefas(tasksTarefas, "../../tarefas.json");
-
-const tarefas = carregarTarefas('./tarefas.json');
-
-// Testar json
+tasks.adicionar("teste", "um teste de tarefa");
+tasks.listar();
