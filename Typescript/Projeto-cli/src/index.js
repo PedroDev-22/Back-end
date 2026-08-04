@@ -1,6 +1,6 @@
+"use strict";
 // Menu / Interação
-
-import readline from 'readline';
+/* import * as readline from 'readline';
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -10,4 +10,4 @@ const rl = readline.createInterface({
 rl.question('Qual seu nome? ', (resposta) => {
     console.log(`Olá, ${resposta}!`);
     rl.close();
-});
+}); */ 
