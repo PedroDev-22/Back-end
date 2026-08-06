@@ -1,10 +1,9 @@
 // Lógica de negócio
-import { salvarTarefas, carregarTarefas } from '../utils/arquivo.js';
-export class GerenciadorTarefas {
+export default class GerenciadorTarefas {
     tarefas;
     proximoId;
-    constructor() {
-        this.tarefas = [];
+    constructor(tasks = []) {
+        this.tarefas = tasks;
         this.proximoId = 1;
     }
     adicionar(titulo, descricao) {
@@ -35,13 +34,11 @@ export class GerenciadorTarefas {
         this.tarefas = this.tarefas.filter((tarefa) => tarefa.id !== id);
         return tarefasIniciais !== this.tarefas.length;
     }
+    removerTodasTarefas() {
+        this.tarefas = [];
+        return true;
+    }
     buscarPorId(id) {
         return this.tarefas.find((tarefa) => tarefa.id === id);
     }
 }
-const tasks = new GerenciadorTarefas();
-tasks.adicionar("teste", "teste para adicionar");
-tasks.adicionar("teste2", "teste 2 para adicionar");
-salvarTarefas(tasks.listar(), "./tarefas.json");
-const tarefas = carregarTarefas('./tarefas.json');
-console.log(tarefas);

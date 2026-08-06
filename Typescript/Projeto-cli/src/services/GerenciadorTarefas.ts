@@ -1,14 +1,13 @@
 // Lógica de negócio
 
 import { Tarefa } from "../models/Tarefa.js";
-import { salvarTarefas, carregarTarefas } from '../utils/arquivo.js'
 
 export default class GerenciadorTarefas {
     private tarefas: Tarefa[];
     private proximoId: number;
 
-    constructor() {
-        this.tarefas = [];
+    constructor(tasks: Tarefa[] = []) {
+        this.tarefas = tasks;
         this.proximoId = 1;
     }
 
@@ -45,16 +44,12 @@ export default class GerenciadorTarefas {
         return tarefasIniciais !== this.tarefas.length;
     }
 
+    removerTodasTarefas(): boolean {
+        this.tarefas = [];
+        return true;
+    }
+
     buscarPorId(id: number): Tarefa | undefined {
         return this.tarefas.find((tarefa) => tarefa.id === id);
     }
 }
-
-const tasks = new GerenciadorTarefas();
-tasks.adicionar("teste", "teste para adicionar");
-tasks.adicionar("teste2", "teste 2 para adicionar");
-
-salvarTarefas(tasks.listar(), "./tarefas.json");
-
-const tarefas = carregarTarefas('./tarefas.json');
-console.log(tarefas);

@@ -11,6 +11,3 @@ export function carregarTarefas(caminho) {
     const dados = fs.readFileSync(caminho, 'utf-8');
     return JSON.parse(dados);
 }
-// Salvar
-// Carregar
-const tarefas = carregarTarefas('./tarefas.json');
