@@ -1,11 +1,16 @@
 // Ler / salvar JSON
+import * as fs from 'fs';
 export function salvarTarefas(tarefas, caminho) {
-    // const tarefasSalvas: Tarefa = [...tarefas]
-    // Converte array para JSON string e salva no arquivo
+    const dados = JSON.stringify(tarefas, null, 2);
+    fs.writeFileSync(caminho, dados, 'utf-8');
 }
 export function carregarTarefas(caminho) {
-    const teste = [];
-    return teste;
-    // Lê arquivo, converte JSON string para array de Tarefa
-    // Se arquivo não existir, retorna array vazio
+    if (!fs.existsSync(caminho)) {
+        return [];
+    }
+    const dados = fs.readFileSync(caminho, 'utf-8');
+    return JSON.parse(dados);
 }
+// Salvar
+// Carregar
+const tarefas = carregarTarefas('./tarefas.json');

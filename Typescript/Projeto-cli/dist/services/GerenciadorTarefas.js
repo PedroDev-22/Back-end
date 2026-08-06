@@ -1,4 +1,5 @@
 // Lógica de negócio
+import { salvarTarefas, carregarTarefas } from '../utils/arquivo.js';
 export class GerenciadorTarefas {
     tarefas;
     proximoId;
@@ -39,5 +40,8 @@ export class GerenciadorTarefas {
     }
 }
 const tasks = new GerenciadorTarefas();
-tasks.adicionar("teste", "um teste de tarefa");
-tasks.listar();
+tasks.adicionar("teste", "teste para adicionar");
+tasks.adicionar("teste2", "teste 2 para adicionar");
+salvarTarefas(tasks.listar(), "./tarefas.json");
+const tarefas = carregarTarefas('./tarefas.json');
+console.log(tarefas);

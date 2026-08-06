@@ -3,7 +3,7 @@
 import { Tarefa } from "../models/Tarefa.js";
 import { salvarTarefas, carregarTarefas } from '../utils/arquivo.js'
 
-export class GerenciadorTarefas {
+export default class GerenciadorTarefas {
     private tarefas: Tarefa[];
     private proximoId: number;
 
@@ -53,10 +53,8 @@ export class GerenciadorTarefas {
 const tasks = new GerenciadorTarefas();
 tasks.adicionar("teste", "teste para adicionar");
 tasks.adicionar("teste2", "teste 2 para adicionar");
-const tasksTarefas = tasks.listar();
 
-salvarTarefas(tasksTarefas, "../../tarefas.json");
+salvarTarefas(tasks.listar(), "./tarefas.json");
 
 const tarefas = carregarTarefas('./tarefas.json');
-
-// Testar json
+console.log(tarefas);

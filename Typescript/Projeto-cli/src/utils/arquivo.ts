@@ -1,6 +1,5 @@
 // Ler / salvar JSON
 
-import { json } from "node:stream/consumers";
 import { Tarefa } from "../models/Tarefa.js";
 import * as fs from 'fs';
 
@@ -17,8 +16,3 @@ export function carregarTarefas(caminho: string): Tarefa[] {
     const dados = fs.readFileSync(caminho, 'utf-8');
     return JSON.parse(dados) as Tarefa[];
 }
-
-// Salvar
-
-// Carregar
-const tarefas = carregarTarefas('./tarefas.json');
