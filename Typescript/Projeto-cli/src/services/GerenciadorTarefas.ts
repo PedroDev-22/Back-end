@@ -4,23 +4,26 @@ import { Tarefa } from "../models/Tarefa.js";
 
 export default class GerenciadorTarefas {
     private tarefas: Tarefa[];
-    private proximoId: number;
+    private _proximoId: number;
 
     constructor(tasks: Tarefa[] = []) {
         this.tarefas = tasks;
-        this.proximoId = 1;
+        this._proximoId = 1;
     }
 
+    set proximoId(novoValor: number) {
+        this._proximoId = novoValor;
+    }
 
     adicionar(titulo: string, descricao: string): Tarefa {
         const novaTarefa: Tarefa = {
-            id: this.proximoId,
+            id: this._proximoId,
             titulo,
             descricao,
             concluida: false,
             criadaEm: new Date(),
         }
-        this.proximoId++;
+        this._proximoId++;
         this.tarefas.push(novaTarefa);
         return novaTarefa;
     }

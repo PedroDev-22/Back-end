@@ -1,20 +1,23 @@
 // Lógica de negócio
 export default class GerenciadorTarefas {
     tarefas;
-    proximoId;
+    _proximoId;
     constructor(tasks = []) {
         this.tarefas = tasks;
-        this.proximoId = 1;
+        this._proximoId = 1;
+    }
+    set proximoId(novoValor) {
+        this._proximoId = novoValor;
     }
     adicionar(titulo, descricao) {
         const novaTarefa = {
-            id: this.proximoId,
+            id: this._proximoId,
             titulo,
             descricao,
             concluida: false,
             criadaEm: new Date(),
         };
-        this.proximoId++;
+        this._proximoId++;
         this.tarefas.push(novaTarefa);
         return novaTarefa;
     }

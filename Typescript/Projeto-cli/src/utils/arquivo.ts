@@ -14,5 +14,9 @@ export function carregarTarefas(caminho: string): Tarefa[] {
     }
 
     const dados = fs.readFileSync(caminho, 'utf-8');
-    return JSON.parse(dados) as Tarefa[];
+    if (dados === "") {
+        return [];
+    } else {
+        return JSON.parse(dados) as Tarefa[];
+    }
 }

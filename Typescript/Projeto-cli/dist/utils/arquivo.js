@@ -9,5 +9,10 @@ export function carregarTarefas(caminho) {
         return [];
     }
     const dados = fs.readFileSync(caminho, 'utf-8');
-    return JSON.parse(dados);
+    if (dados === "") {
+        return [];
+    }
+    else {
+        return JSON.parse(dados);
+    }
 }
