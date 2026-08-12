@@ -1,0 +1,5 @@
+2026-08-11T21:26:40.738Z O usuário acessou o sistema
+2026-08-11T21:26:46.539Z O usuário acessou o sistema
+2026-08-11T21:26:57.843Z O usuário acessou o sistema
+2026-08-11T21:27:03.119Z O usuário acessou o sistema
+2026-08-11T21:27:06.343Z O usuário acessou o sistema
