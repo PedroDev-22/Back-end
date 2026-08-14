@@ -12,11 +12,20 @@ const analisar = async () => {
     rl.on('line', (linha) => {
         if (!linha.includes("id")) {
             const dados = linha.split(",");
-            const preco = parseFloat(dados[2]);
-            totalVendas += preco;
-            console.log(totalVendas);
+            const produto = {
+                id: parseInt(dados[0]),
+                nome: dados[1],
+                preco: parseInt(dados[2]),
+                categoria: dados[3]
+            };
+            if (produto.preco > produtoMaisCaro.valor) {
+                produtoMaisCaro.nome = produto.nome;
+                produtoMaisCaro.valor = produto.preco;
+            }
+            totalVendas += produto.preco;
         }
     });
 };
+// Add evento close, salvar resultado no relatorio.json usando writeFile
 analisar();
 //# sourceMappingURL=analisador.js.map
