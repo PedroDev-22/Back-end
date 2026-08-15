@@ -2,6 +2,14 @@ import { createReadStream } from 'node:fs';
 import { writeFile } from 'node:fs/promises'
 import readline from 'node:readline';
 
+type ProdutoCaro = {
+    nome: string;
+    valor: number;
+}
+
+let totalVendas: number = 0;
+let produtoMaisCaro: ProdutoCaro = { nome: '', valor: 0 };
+
 const analisar = async () => {
     const readStream = createReadStream('./mini-projeto/dados.csv');
 
@@ -10,14 +18,6 @@ const analisar = async () => {
         crlfDelay: Infinity,
     });
 
-    type ProdutoCaro = {
-        nome: string;
-        valor: number;
-    }
-
-    let totalVendas: number = 0;
-    let produtoMaisCaro: ProdutoCaro = { nome: '', valor: 0 };
-
     type Produto = {
         id: number;
         nome: string;
@@ -25,13 +25,18 @@ const analisar = async () => {
         categoria: string;
     }
 
+    let primeiraLinha = true;
+
     rl.on('line', (linha: string) => {
-        if (!linha.includes("id")) {
+        if (primeiraLinha) {
+            primeiraLinha = false;
+            return;
+        }
             const dados: string[] = linha.split(",");
             const produto: Produto = {
                 id: parseInt(dados[0]!),
                 nome: dados[1]!,
-                preco: parseInt(dados[2]!),
+                preco: parseFloat(dados[2]!),
                 categoria: dados[3]!
             }
             if (produto.preco > produtoMaisCaro.valor) {
@@ -39,10 +44,13 @@ const analisar = async () => {
                 produtoMaisCaro.valor = produto.preco;
             }
             totalVendas += produto.preco;
-        }
+    })
+
+    rl.on('close', () => {
+        const dados = [totalVendas, produtoMaisCaro];
+        const dadosJson = JSON.stringify(dados);
+        writeFile('./relatorio.json', dadosJson, 'utf-8');
     })
 }
-
-// Add evento close, salvar resultado no relatorio.json usando writeFile
 
 analisar();
