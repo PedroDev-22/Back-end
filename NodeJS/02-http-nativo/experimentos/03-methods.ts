@@ -11,12 +11,12 @@ const server = http.createServer((request, response) => {
         }
 
         if (method === 'POST') {
-            response.writeHead(201, {"content-type": 'application/json'}); // 201 => criado
-            return response.end(JSON.stringify({message: "Venda criada com sucesso"}));
+            response.writeHead(201, { "content-type": 'application/json' }); // 201 => criado
+            return response.end(JSON.stringify({ message: "Venda criada com sucesso" }));
         }
     }
 
-    response.writeHead(404, {"content-type": "text/plain; charset=utf-8"});
+    response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
     response.end(`Rota não encontrada`);
 });
 
