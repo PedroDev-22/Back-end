@@ -2,7 +2,7 @@ import express from 'express';
 const app = express();
 app.get('/vendas', (req, res) => {
     // res.send("Olá com express!");
-    const { min, categoria } = req.query;
+    const { min, categoria } = req.query; // procura parametro "/vendas?min=x&&categoria=x"
     console.log(`Filtrando vendas maiores que ${min} na categoria: ${categoria}`);
     res.json({
         mensagem: "Filtro recebido",
@@ -10,7 +10,7 @@ app.get('/vendas', (req, res) => {
     });
 });
 app.get('/usuarios/:id', (req, res) => {
-    const { id } = req.query;
+    const { id } = req.params; // procura rota "/usarios/qualquer_coisa_aqui_vira_id"
 });
 const PORT = 3000;
 app.listen(PORT, () => {

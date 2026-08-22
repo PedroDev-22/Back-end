@@ -5,11 +5,10 @@ const produtos = [
     { id: 3, nome: "Monitor", preco: 900 }
 ];
 const app = express();
+app.use(express.json());
 app.get('/produtos', (req, res) => {
     const { max_preco } = req.query;
-    console.log(max_preco);
-    console.log(Number(max_preco));
-    const produtosFiltrados = produtos.filter((produto) => produto.preco >= Number(max_preco));
+    const produtosFiltrados = produtos.filter((produto) => produto.preco <= Number(max_preco));
     res.status(200).json({
         mensagem: "Produtos filtrados",
         produtos: produtosFiltrados
@@ -30,7 +29,6 @@ app.get('/produtos/:id', (req, res) => {
         });
     }
 });
-app.use(express.json());
 app.post('/produtos', (req, res) => {
     const novoProduto = req.body;
     produtos.push(novoProduto);
