@@ -2,16 +2,22 @@ import { Router } from "express";
 import { readFile, writeFile } from "node:fs/promises";
 const router = Router();
 async function buscarTarefas() {
-    const file = await readFile('../tarefas.json', { encoding: "utf-8" });
+    const file = await readFile('./mini-projeto/task-master-api-CRUD/tarefas.json', { encoding: "utf-8" });
     if (file === '') {
         return [];
     }
     return JSON.parse(file);
 }
 async function salvarTarefas(tarefas) {
-    const dadosString = JSON.stringify(tarefas, null, 2);
-    await writeFile('../tarefas.json', dadosString);
-    console.log("Tarefas carregadas");
+    const isArray = Array.isArray(tarefas);
+    let dadosString;
+    if (isArray) {
+        dadosString = JSON.stringify(tarefas);
+    }
+    else {
+        dadosString = [];
+    }
+    await writeFile('./mini-projeto/task-master-api-CRUD/tarefas.json', dadosString);
 }
 router.get('/', async (req, res, next) => {
     let tarefas = await buscarTarefas();
@@ -66,33 +72,41 @@ router.get('/', async (req, res, next) => {
 });
 router.post('/', async (req, res, next) => {
     const tarefas = await buscarTarefas();
-    let maiorId = tarefas.reduce((max, task) => task.id > max ? task.id : max, 1);
+    let maiorId = 0;
+    tarefas.forEach(tarefa => {
+        if (tarefa.id > Number(maiorId)) {
+            maiorId = tarefa.id;
+        }
+    });
+    maiorId++;
     const tarefa = req.body;
     tarefa.id = maiorId;
     const tarefaAdd = tarefa;
     if (tarefaAdd.id === maiorId) {
         tarefas.push(tarefaAdd);
-        maiorId++;
     }
     await salvarTarefas(tarefas);
     res.status(201).json({
         mensagem: "Tarefa Criada",
         tarefa: tarefas
     });
+    next();
 });
 router.put('/:id', async (req, res, next) => {
     const tarefas = await buscarTarefas();
-    const { id } = req.params;
+    const id = req.params.id;
     let concluida = false;
+    let modificado = false;
     tarefas.forEach(tarefa => {
         if (tarefa.id === Number(id)) {
             tarefa.concluida = !tarefa.concluida;
             concluida = tarefa.concluida;
-        }
-        else {
-            return next(new Error("Tarefa não encontrada"));
+            modificado = true;
         }
     });
+    if (!modificado) {
+        return next(new Error("Tarefa não encontrada"));
+    }
     await salvarTarefas(tarefas);
     res.status(200).json({
         mensagem: concluida ? `Tarefa marcada como concluída` : `Tarefa marcada como inconcluída`,
@@ -111,6 +125,8 @@ router.delete('/:id', async (req, res, next) => {
         });
     }
     else {
+        console.log("Tarefas:", tarefas);
+        console.log(novasTarefas);
         return next(new Error("Tarefa não encontrada"));
     }
     next();

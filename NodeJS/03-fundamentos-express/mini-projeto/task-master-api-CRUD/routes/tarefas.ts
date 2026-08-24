@@ -11,7 +11,7 @@ type Tarefa = {
 
 
 async function buscarTarefas() {
-    const file = await readFile('../tarefas.json', { encoding: "utf-8" })
+    const file = await readFile('./mini-projeto/task-master-api-CRUD/tarefas.json', { encoding: "utf-8" })
 
     if (file === '') {
         return [];
@@ -20,9 +20,15 @@ async function buscarTarefas() {
 }
 
 async function salvarTarefas(tarefas: Tarefa[]) {
-    const dadosString = JSON.stringify(tarefas, null, 2);
-    await writeFile('../tarefas.json', dadosString);
-    console.log("Tarefas carregadas")
+    const isArray = Array.isArray(tarefas);
+    let dadosString;
+    if (isArray) {
+        dadosString = JSON.stringify(tarefas);
+    } else {
+        dadosString = []
+    }
+
+    await writeFile('./mini-projeto/task-master-api-CRUD/tarefas.json', dadosString);
 }
 
 router.get('/', async (req, res, next) => {
@@ -83,7 +89,13 @@ router.post('/', async (req, res, next) => {
 
     const tarefas: Tarefa[] = await buscarTarefas();
 
-    let maiorId = tarefas.reduce((max, task) => task.id > max ? task.id : max, 1);
+    let maiorId = 0;
+    tarefas.forEach(tarefa => {
+        if (tarefa.id > Number(maiorId)) {
+            maiorId = tarefa.id
+        }
+    })
+    maiorId++;
 
     const tarefa = req.body;
     tarefa.id = maiorId;
@@ -91,7 +103,6 @@ router.post('/', async (req, res, next) => {
 
     if (tarefaAdd.id === maiorId) {
         tarefas.push(tarefaAdd);
-        maiorId++;
     }
 
     await salvarTarefas(tarefas);
@@ -100,21 +111,27 @@ router.post('/', async (req, res, next) => {
         tarefa: tarefas
     })
 
+    next();
 });
 
 router.put('/:id', async (req, res, next) => {
     const tarefas: Tarefa[] = await buscarTarefas();
-    const { id } = req.params;
+    const id = req.params.id;
+
     let concluida: boolean = false;
+    let modificado: boolean = false
 
     tarefas.forEach(tarefa => {
         if (tarefa.id === Number(id)) {
             tarefa.concluida = !tarefa.concluida;
             concluida = tarefa.concluida
-        } else {
-            return next(new Error("Tarefa não encontrada"));
+            modificado = true;
         }
     })
+
+    if (!modificado) {
+        return next(new Error("Tarefa não encontrada"));
+    }
 
     await salvarTarefas(tarefas);
     res.status(200).json({
@@ -133,7 +150,7 @@ router.delete('/:id', async (req, res, next) => {
     if (novasTarefas.length !== tarefas.length) {
         await salvarTarefas(novasTarefas);
         res.status(201).json({
-            mensagem: `Tarefa com ${id} removida`,
+            mensagem: `Tarefa com id ${id} removida`,
             tarefas: novasTarefas
         })
     } else {
@@ -144,3 +161,10 @@ router.delete('/:id', async (req, res, next) => {
 });
 
 export default router;
+
+// Erro no delete:
+/* { id: '1', titulo: 'Comprar sapato novo', concluida: 'false' },
+  { titulo: 'Lavar roupa', concluida: false, id: 2 } */
+
+// Verificar com Number, toString e etc;
+// Erro causado em adicionar tarefas
