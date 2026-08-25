@@ -16,22 +16,32 @@ async function buscarTarefas() {
     if (file === '') {
         return [];
     }
-    return JSON.parse(file);
+    const parsed = JSON.parse(file);
+    return parsed.map((t: any) => ({
+        id: Number(t.id),
+        titulo: t.titulo,
+        concluida: t.concluida === 'true' || t.concluida === true
+    }));
 }
 
 async function salvarTarefas(tarefas: Tarefa[]) {
     const isArray = Array.isArray(tarefas);
     let dadosString;
     if (isArray) {
-        dadosString = JSON.stringify(tarefas);
+        const tarefasParaJson = tarefas.map(t => ({
+            id: String(t.id),
+            titulo: t.titulo,
+            concluida: String(t.concluida)
+        }));
+        dadosString = JSON.stringify(tarefasParaJson);
     } else {
-        dadosString = []
+        dadosString = "[]"
     }
 
     await writeFile('./mini-projeto/task-master-api-CRUD/tarefas.json', dadosString);
 }
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
     let tarefas: Tarefa[] = await buscarTarefas();
 
     const filtro = req.query.concluida;
@@ -82,10 +92,9 @@ router.get('/', async (req, res, next) => {
         }
     }
 
-    next();
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', async (req, res) => {
 
     const tarefas: Tarefa[] = await buscarTarefas();
 
@@ -108,10 +117,9 @@ router.post('/', async (req, res, next) => {
     await salvarTarefas(tarefas);
     res.status(201).json({
         mensagem: "Tarefa Criada",
-        tarefa: tarefas
+        tarefa: tarefaAdd
     })
 
-    next();
 });
 
 router.put('/:id', async (req, res, next) => {
@@ -138,7 +146,6 @@ router.put('/:id', async (req, res, next) => {
         mensagem: concluida ? `Tarefa marcada como concluída` : `Tarefa marcada como inconcluída`,
     })
 
-    next();
 })
 
 router.delete('/:id', async (req, res, next) => {
@@ -149,7 +156,7 @@ router.delete('/:id', async (req, res, next) => {
 
     if (novasTarefas.length !== tarefas.length) {
         await salvarTarefas(novasTarefas);
-        res.status(201).json({
+        res.status(200).json({
             mensagem: `Tarefa com id ${id} removida`,
             tarefas: novasTarefas
         })
@@ -157,14 +164,6 @@ router.delete('/:id', async (req, res, next) => {
         return next(new Error("Tarefa não encontrada"));
     }
 
-    next();
 });
 
 export default router;
-
-// Erro no delete:
-/* { id: '1', titulo: 'Comprar sapato novo', concluida: 'false' },
-  { titulo: 'Lavar roupa', concluida: false, id: 2 } */
-
-// Verificar com Number, toString e etc;
-// Erro causado em adicionar tarefas
