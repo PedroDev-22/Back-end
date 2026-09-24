@@ -6,7 +6,7 @@ type ProdutoCaro = {
     nome: string;
     valor: number;
 }
-// 
+ 
 let totalVendas: number = 0;
 let produtoMaisCaro: ProdutoCaro = { nome: '', valor: 0 };
 
