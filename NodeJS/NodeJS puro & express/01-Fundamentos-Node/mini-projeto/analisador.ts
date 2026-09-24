@@ -12,7 +12,6 @@ let produtoMaisCaro: ProdutoCaro = { nome: '', valor: 0 };
 
 const analisar = async () => {
     const readStream = createReadStream('./mini-projeto/dados.csv');
-
     const rl = readline.createInterface({
         input: readStream,
         crlfDelay: Infinity,

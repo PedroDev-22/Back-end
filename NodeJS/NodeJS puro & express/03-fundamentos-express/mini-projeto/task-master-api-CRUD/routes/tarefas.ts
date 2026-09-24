@@ -1,5 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { readFile, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+
+const caminhoTarefas = fileURLToPath(new URL('../tarefas.json', import.meta.url));
 
 const router = Router();
 
@@ -11,7 +14,7 @@ type Tarefa = {
 
 
 async function buscarTarefas() {
-    const file = await readFile('./mini-projeto/task-master-api-CRUD/tarefas.json', { encoding: "utf-8" })
+    const file = await readFile(caminhoTarefas, { encoding: "utf-8" })
 
     if (file === '') {
         return [];
@@ -38,7 +41,7 @@ async function salvarTarefas(tarefas: Tarefa[]) {
         dadosString = "[]"
     }
 
-    await writeFile('./mini-projeto/task-master-api-CRUD/tarefas.json', dadosString);
+    await writeFile(caminhoTarefas, dadosString);
 }
 
 router.get('/', async (req, res) => {

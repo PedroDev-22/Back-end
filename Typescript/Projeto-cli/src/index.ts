@@ -5,6 +5,9 @@ import GerenciadorTarefas from './services/GerenciadorTarefas.js';
 import { salvarTarefas, carregarTarefas } from './utils/arquivo.js';
 import { Tarefa } from './models/Tarefa.js';
 import { appendFileSync } from 'fs';
+import { fileURLToPath } from 'node:url';
+
+const caminhoTarefas = fileURLToPath(new URL('../tarefas.json', import.meta.url));
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -17,7 +20,7 @@ let tarefasCarregadas: boolean = false;
 
 // Carregando tarefas
 console.log("Carregando tarefas salvas. Espere um momento...")
-const tasksSalvas: Tarefa[] = carregarTarefas('./tarefas.json');
+const tasksSalvas: Tarefa[] = carregarTarefas(caminhoTarefas);
 const gerenciador = new GerenciadorTarefas(tasksSalvas);
 setTimeout(() => {
     if (gerenciador.buscarPorId(1) === undefined) {
@@ -160,7 +163,7 @@ const mostrarMenu = () => {
                     if (resposta === 's') {
                         console.log("Salvando...");
                         setTimeout(() => {
-                            salvarTarefas(gerenciador.listar(), './tarefas.json')
+                            salvarTarefas(gerenciador.listar(), caminhoTarefas)
                             console.log("Tarefas salvadas")
                             console.log("Saindo...")
                         }, 1000)
