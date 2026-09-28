@@ -63,17 +63,30 @@ app.get('/livros', async (req: Request, res: Response, next: NextFunction) => {
 
 app.post('/livros', async (req: Request, res: Response, next: NextFunction) => {
 
-    const conteudo = await fs.readFile('./mini-projeto/API-REST-de-Livros/livros.json', 'utf-8');
-    const livros: Livro[] = JSON.parse(conteudo)
-
-
-    type Livro = {
+    interface LivroAdd {
         titulo: string;
         autor: string;
         ano: number
     }
 
-    const livroAdd = req.body as Livro | undefined;
+    interface Livro extends LivroAdd {
+        id: string
+    }
+
+    const conteudo = await fs.readFile('./mini-projeto/API-REST-de-Livros/livros.json', 'utf-8');
+    const livros: Livro[] = JSON.parse(conteudo)
+
+    const livroAdd = req.body;
+
+    let maiorId: number = 1;
+
+    livros.forEach(livro => {
+        if (Number(livro.id) > maiorId) {
+            maiorId = Number(livro.id)
+        }
+    })
+
+    maiorId++
 
     if (typeof livroAdd === 'object' &&
         livroAdd !== null &&
@@ -81,26 +94,55 @@ app.post('/livros', async (req: Request, res: Response, next: NextFunction) => {
         Object.hasOwn(livroAdd, 'autor') &&
         Object.hasOwn(livroAdd, 'ano')
     ) {
-        livros.push(livroAdd);
+        livroAdd.id = maiorId.toString();
+        const livroAdicionar: Livro = livroAdd;
+        livros.push(livroAdicionar);
         await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(livros, null, 2), 'utf-8')
-        res.status(201).json(JSON.stringify({ mensagem: "Livro adicionado", livros: livroAdd }))
+        res.status(201).json(JSON.stringify({ mensagem: `Livro ${livroAdd.titulo} adicionado`, livros: livroAdd }))
     } else {
         next(new Error("Falta um campo obrigatório"));
     }
 })
 
-app.delete('/livros/:id', (req: Request, res: Response, next: NextFunction) => {
+app.delete('/livros/:id', async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
+
+    type Livro = {
+        id: string
+        titulo: string;
+        autor: string;
+        ano: number
+    }
+
+    const conteudo = await fs.readFile('./mini-projeto/API-REST-de-Livros/livros.json', 'utf-8');
+    const livros: Livro[] = JSON.parse(conteudo)
+
+    const livrosFiltrados = livros.filter(livro => livro.id !== id)
+
+    let filtrou: boolean = true;
+
+    if (livrosFiltrados.length === livros.length) {
+        filtrou = false
+    }
+
+    await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(livros, null, 2), 'utf-8')
+    res.status(201).json(JSON.stringify({
+        mensagem: filtrou
+            ? `Livro com id ${id} removido`
+            : next(new Error("Livro com id especificado não encontrado")),
+        livros: livrosFiltrados
+    }))
+
 })
 
 app.listen(3000, () => console.log("Server iniciado na porta 3000"));
 
 
 // To do:
-// Testar se post adiciona o livro
-// Fazer delete
+// Colocar ultimoId no livros.json e guarda-lo como o maiorId, para ser usado na comparação do post. Usa-lo com destructuring (const {ultimoId, livro} = JSON.parse...)
 // Fazer a rota de erros
 
 
-// Erros para tratar:
+// Erros para tratar na rota de erros:
 // Linha 81 - Falta um campo obrigatório em adicionar livro
+// Linha 130 - Livro com id especificado não encontrado
