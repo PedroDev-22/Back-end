@@ -33,9 +33,15 @@ app.get('/livros', async (req: Request, res: Response, next: NextFunction) => {
         }
 
         const conteudo = await fs.readFile('./mini-projeto/API-REST-de-Livros/livros.json', 'utf-8');
-        const livros: Livro[] = JSON.parse(conteudo)
 
-        livrosFiltrados = livros;
+        type Dados = {
+            ultimoId: number | null,
+            livros: Livro[]
+        };
+
+        const { ultimoId, livros }: Dados = JSON.parse(conteudo);
+
+        let livrosFiltrados = livros;
 
         if (autor) {
             livrosFiltrados = livrosFiltrados.filter((livro) => livro.autor === autor)
@@ -47,15 +53,17 @@ app.get('/livros', async (req: Request, res: Response, next: NextFunction) => {
             }
         }
 
-        return res.status(200).json({
-            mensagem: "Livros encontrados",
-            livros: livrosFiltrados
-        })
-
+        if (livrosFiltrados.length > 0) {
+            res.status(200).json({
+                mensagem: "Livros encontrados",
+                livros: livrosFiltrados
+            })
+        } else {
+            throw new Error("Livro(s) não encontrado(s)")
+        }
     } catch (erro) {
         return res.status(404).json({
-            mensagem: "Livros não encontrados",
-            livros: []
+            mensagem: "Livros(s) não encontrado(s)",
         })
     }
 
@@ -70,22 +78,31 @@ app.post('/livros', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     interface Livro extends LivroAdd {
-        id: string
+        id: number
     }
 
     const conteudo = await fs.readFile('./mini-projeto/API-REST-de-Livros/livros.json', 'utf-8');
-    const livros: Livro[] = JSON.parse(conteudo)
+    type Dados = {
+        ultimoId: number | null,
+        livros: Livro[]
+    };
+
+    let { ultimoId, livros }: Dados = JSON.parse(conteudo);
 
     const livroAdd = req.body;
 
     let maiorId: number = 1;
 
-    livros.forEach(livro => {
-        if (Number(livro.id) > maiorId) {
-            maiorId = Number(livro.id)
-        }
-    })
-
+    if (ultimoId !== null) {
+        maiorId = ultimoId
+    } else {
+        livros.forEach((livro) => {
+            if (livro.id > maiorId) {
+                maiorId = livro.id
+                ultimoId = maiorId
+            }
+        })
+    }
     maiorId++
 
     if (typeof livroAdd === 'object' &&
@@ -94,10 +111,12 @@ app.post('/livros', async (req: Request, res: Response, next: NextFunction) => {
         Object.hasOwn(livroAdd, 'autor') &&
         Object.hasOwn(livroAdd, 'ano')
     ) {
-        livroAdd.id = maiorId.toString();
+        livroAdd.id = maiorId;
         const livroAdicionar: Livro = livroAdd;
         livros.push(livroAdicionar);
-        await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(livros, null, 2), 'utf-8')
+
+        const dados = { ultimoId, livros }
+        await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(dados, null, 2), 'utf-8')
         res.status(201).json(JSON.stringify({ mensagem: `Livro ${livroAdd.titulo} adicionado`, livros: livroAdd }))
     } else {
         next(new Error("Falta um campo obrigatório"));
@@ -108,16 +127,23 @@ app.delete('/livros/:id', async (req: Request, res: Response, next: NextFunction
     const { id } = req.params;
 
     type Livro = {
-        id: string
+        id: number
         titulo: string;
         autor: string;
         ano: number
     }
 
     const conteudo = await fs.readFile('./mini-projeto/API-REST-de-Livros/livros.json', 'utf-8');
-    const livros: Livro[] = JSON.parse(conteudo)
+    type Dados = {
+        ultimoId: number | null,
+        livros: Livro[]
+    };
 
-    const livrosFiltrados = livros.filter(livro => livro.id !== id)
+
+    const { ultimoId, livros }: Dados = JSON.parse(conteudo);
+    console.log(ultimoId, livros);
+
+    const livrosFiltrados = livros.filter(livro => livro.id !== Number(id))
 
     let filtrou: boolean = true;
 
@@ -125,7 +151,8 @@ app.delete('/livros/:id', async (req: Request, res: Response, next: NextFunction
         filtrou = false
     }
 
-    await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(livros, null, 2), 'utf-8')
+    const dados = { ultimoId, livros: livrosFiltrados }
+    await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(dados, null, 2), 'utf-8')
     res.status(201).json(JSON.stringify({
         mensagem: filtrou
             ? `Livro com id ${id} removido`
@@ -135,14 +162,27 @@ app.delete('/livros/:id', async (req: Request, res: Response, next: NextFunction
 
 })
 
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    if (err.message === "Falta um campo obrigatório") {
+        res.status(422).json({
+            mensagem: "Erro: Falta um campo obrigatório nos dados fornecidos"
+        })
+    } else if (err.message === "Livro com id especificado não encontrado") {
+        res.status(404).json({
+            mensagem: "Erro: Livro com id especificado não encontrado"
+        })
+    } else {
+        res.json({
+            mensagem: `Erro: ${err.cause}`
+        })
+    }
+})
+
 app.listen(3000, () => console.log("Server iniciado na porta 3000"));
 
 
 // To do:
-// Colocar ultimoId no livros.json e guarda-lo como o maiorId, para ser usado na comparação do post. Usa-lo com destructuring (const {ultimoId, livro} = JSON.parse...)
-// Fazer a rota de erros
-
+// Revisar código e testar todas as rotas
 
 // Erros para tratar na rota de erros:
-// Linha 81 - Falta um campo obrigatório em adicionar livro
-// Linha 130 - Livro com id especificado não encontrado
+// OBS: se erros retornar os livros filtrados no res.json, fazer operador ternário para verificar: se filtrou, mostrar os livros, se não, não mostrar nada (ou mostrar os livros, ver depois)
