@@ -1,4 +1,3 @@
-import readLine from 'node:readline'
 import fs from 'node:fs/promises'
 import express, { Request, Response, NextFunction } from 'express';
 
@@ -59,12 +58,14 @@ app.get('/livros', async (req: Request, res: Response, next: NextFunction) => {
                 livros: livrosFiltrados
             })
         } else {
-            throw new Error("Livro(s) não encontrado(s)")
+            res.status(404).json({
+                mensagem: "Livros não encontrados",
+                livros: []
+            })
+
         }
     } catch (erro) {
-        return res.status(404).json({
-            mensagem: "Livros(s) não encontrado(s)",
-        })
+        next(erro)
     }
 
 })
@@ -92,18 +93,25 @@ app.post('/livros', async (req: Request, res: Response, next: NextFunction) => {
     const livroAdd = req.body;
 
     let maiorId: number = 1;
+    let novoId: number = 0;
 
     if (ultimoId !== null) {
-        maiorId = ultimoId
+        ultimoId++
+        novoId = ultimoId
     } else {
-        livros.forEach((livro) => {
-            if (livro.id > maiorId) {
-                maiorId = livro.id
-                ultimoId = maiorId
-            }
-        })
+        if (livros.length > 0) {
+            livros.forEach((livro) => {
+                if (livro.id >= maiorId) {
+                    maiorId = livro.id
+                    novoId = maiorId + 1
+                    ultimoId = novoId
+                }
+            })
+        } else {
+            novoId = maiorId;
+            ultimoId = novoId;
+        }
     }
-    maiorId++
 
     if (typeof livroAdd === 'object' &&
         livroAdd !== null &&
@@ -111,13 +119,13 @@ app.post('/livros', async (req: Request, res: Response, next: NextFunction) => {
         Object.hasOwn(livroAdd, 'autor') &&
         Object.hasOwn(livroAdd, 'ano')
     ) {
-        livroAdd.id = maiorId;
+        livroAdd.id = novoId;
         const livroAdicionar: Livro = livroAdd;
         livros.push(livroAdicionar);
 
         const dados = { ultimoId, livros }
         await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(dados, null, 2), 'utf-8')
-        res.status(201).json(JSON.stringify({ mensagem: `Livro ${livroAdd.titulo} adicionado`, livros: livroAdd }))
+        res.status(201).json({ mensagem: `Livro ${livroAdd.titulo} adicionado`, livros: livroAdd })
     } else {
         next(new Error("Falta um campo obrigatório"));
     }
@@ -125,6 +133,10 @@ app.post('/livros', async (req: Request, res: Response, next: NextFunction) => {
 
 app.delete('/livros/:id', async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
+
+    if (id === undefined) {
+        next(new Error("Por favor, forneça o id do livro"))
+    }
 
     type Livro = {
         id: number
@@ -141,7 +153,6 @@ app.delete('/livros/:id', async (req: Request, res: Response, next: NextFunction
 
 
     const { ultimoId, livros }: Dados = JSON.parse(conteudo);
-    console.log(ultimoId, livros);
 
     const livrosFiltrados = livros.filter(livro => livro.id !== Number(id))
 
@@ -153,13 +164,14 @@ app.delete('/livros/:id', async (req: Request, res: Response, next: NextFunction
 
     const dados = { ultimoId, livros: livrosFiltrados }
     await fs.writeFile('./mini-projeto/API-REST-de-Livros/livros.json', JSON.stringify(dados, null, 2), 'utf-8')
-    res.status(201).json(JSON.stringify({
-        mensagem: filtrou
-            ? `Livro com id ${id} removido`
-            : next(new Error("Livro com id especificado não encontrado")),
-        livros: livrosFiltrados
-    }))
-
+    if (filtrou) {
+        res.status(201).json({
+            mensagem: `Livro com id ${id} removido`,
+            livros: livrosFiltrados
+        })
+    } else {
+        next(new Error("Livro com id especificado não encontrado"))
+    }
 })
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -171,18 +183,20 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         res.status(404).json({
             mensagem: "Erro: Livro com id especificado não encontrado"
         })
+
+    } else if (err.message === "Por favor, forneça o id do livro") {
+        res.status(422).json({
+            mensagem: "Por favor, forneça o id do livro"
+        })
+    } else if (err.message === "Livros(s) não encontrado(s)") {
+        res.status(404).json({
+            mensagem: "Livros(s) não encontrado(s)"
+        })
     } else {
-        res.json({
-            mensagem: `Erro: ${err.cause}`
+        res.status(500).json({
+            mensagem: `Erro: ${err.message}`
         })
     }
 })
 
 app.listen(3000, () => console.log("Server iniciado na porta 3000"));
-
-
-// To do:
-// Revisar código e testar todas as rotas
-
-// Erros para tratar na rota de erros:
-// OBS: se erros retornar os livros filtrados no res.json, fazer operador ternário para verificar: se filtrou, mostrar os livros, se não, não mostrar nada (ou mostrar os livros, ver depois)
