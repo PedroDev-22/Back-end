@@ -1,17 +1,11 @@
 {
-  "ultimoId": 13,
+  "ultimoId": 15,
   "livros": [
     {
       "id": 1,
       "titulo": "Clean Code",
       "autor": "Robert C. Martin",
       "ano": 2008
-    },
-    {
-      "titulo": "O morro dos ventos uivantes",
-      "autor": "Emily Brontë",
-      "ano": 1847,
-      "id": 8
     },
     {
       "titulo": "A Morte de Ivan Ilitch",
@@ -24,6 +18,18 @@
       "autor": "Antoine de Saint-Exupéry",
       "ano": 1943,
       "id": 13
+    },
+    {
+      "titulo": "Memórias Póstumas de Brás Cubas",
+      "autor": "Machado de Assis",
+      "ano": 1881,
+      "id": 14
+    },
+    {
+      "titulo": "O cortiço",
+      "autor": "Aluisío Azevedo",
+      "ano": 1889,
+      "id": 15
     }
   ]
 }

@@ -54,12 +54,12 @@ app.get('/livros', async (req: Request, res: Response, next: NextFunction) => {
 
         if (livrosFiltrados.length > 0) {
             res.status(200).json({
-                mensagem: "Livros encontrados",
+                mensagem: "Livro(s) encontrado(s)",
                 livros: livrosFiltrados
             })
         } else {
-            res.status(404).json({
-                mensagem: "Livros não encontrados",
+            res.status(200).json({
+                mensagem: "Livro(s) não encontrado(s)",
                 livros: []
             })
 
