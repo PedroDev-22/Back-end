@@ -1,13 +1,11 @@
 import { Router } from "express";
-import { tarefasRepository } from "../repositories/tarefas-repositories.js";
-import { error } from "node:console";
-import { nextTick } from "node:process";
+import { tarefasRepository } from "../repositories/tarefas-repository.js";
 
 const router = Router();
 
 router.get('/', async (req, res, next) => {
     try {
-        const tarefas = await tarefasRepository.buscarTodos()
+        const tarefas = await tarefasRepository.buscarTodos();
         if (tarefas.length !== 0) {
             res.status(200).json({
                 mensagem: "Tarefas encontradas",
@@ -27,21 +25,21 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-        const { titulo } = req.body;
+        const { titulo, categoriaId } = req.body;
 
         if (!titulo) {
-            return res.status(400).json({ mensagem: "Titulo é obrigatório" })
+            return res.status(400).json({mensagem: "Titulo é obrigatório"});
         }
 
-        const tarefa = await tarefasRepository.criar(titulo);
+        const tarefa = await tarefasRepository.criar(titulo, categoriaId);
         res.status(201).json({
-            mensagem: "Tarefa criada",
-            tarefa: tarefa
+            mensagem: `Tarefa ${tarefa.titulo} criada`,
+            tarefa
         })
-    } catch (error) {
+    }
+    catch (error) {
         next(error);
     }
-
 })
 
 router.put('/:id', async (req, res, next) => {
@@ -54,7 +52,7 @@ router.put('/:id', async (req, res, next) => {
         const tarefaAtualizada = await tarefasRepository.atualizar(id)
 
         if (!tarefaAtualizada) {
-            return next(new Error("Tarefa não encontrada"))
+            return res.status(404).json({mensagem: "Tarefa não encontrada"});
         }
 
         res.status(200).json({
@@ -79,7 +77,7 @@ router.delete('/:id', async (req, res, next) => {
         const tarefasAtualizadas = await tarefasRepository.buscarTodos();
 
         res.status(200).json({
-            mensagem: `Tarefa com id ${id} deletada`,
+            mensagem: `Tarefa '${tarefaDeletada.titulo}' deletada`,
             tarefas: tarefasAtualizadas
         })
 

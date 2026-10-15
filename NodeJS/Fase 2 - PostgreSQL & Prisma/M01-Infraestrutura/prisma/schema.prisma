@@ -12,10 +12,23 @@ datasource db {
   provider = "postgresql"
 }
 
+model Categoria {
+  id      Int      @id @default(autoincrement())
+  titulo  String
+  tarefas Tarefa[]
+
+  @@map("categorias")
+}
+
 model Tarefa {
-  id        Int     @id @default(autoincrement())
-  titulo    String
-  concluida Boolean @default(false)
+  id          Int        @id @default(autoincrement())
+  titulo      String
+  concluida   Boolean    @default(false)
+  categoriaId Int?
+  categoria   Categoria? @relation(fields: [categoriaId], references: [id])
 
   @@map("tarefas")
 }
+
+// categoriaId e categoria são opcionais (por causa do "?"). Com o @relation, ele vai relacionar algo de Categoria com algo de Tarefa, nesse caso vai ser o categoriaId e o id de Categoria, logo, eles vão ter o mesmo valor. 
+// Nesse caso, categoria (model Tarefa) não existe - não há essa coluna no sql. Esse field é um campo de navegação
