@@ -1,0 +1,10 @@
+== Sem código, só perguntas ==
+
+1. fixed-point, pois faz com que capturemos as milhas em decimal, atribuindo um valor mais especifíco para elas. Além de que, como sabemos que o máximo é 999, podemos fazer numeric(3, 1), um pequeno dado, que não ocupa tanto espaço.
+=> seria numeric(4, 1). Pois esqueci que precision é para a esquerda e direita, não só na esquerda
+
+2. varchar(n) ou text. É importante separar o primeiro e o último nome para nós não guardarmos uma grande base de dados inutilmente, pois, geralmente, usamos o primeiro nome, além de a leitura ficar mais confortável.
+=> Deveria fornercer o número máximo de caracteres - varchar(50)
+
+3. Vai se transformar em um erro, pois o timestamp data type não aceita essa estrutura.
+=> Ok.
