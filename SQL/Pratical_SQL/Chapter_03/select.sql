@@ -36,13 +36,28 @@
 
 -- SELECT first_name, last_name, salary
 -- FROM teachers
--- WHERE salary BETWEEN 40000 and 70000
+-- WHERE salary BETWEEN 40000 and 70000;
 -- ou
-SELECT first_name, last_name, school, salary 
-FROM teachers 
-WHERE salary >= 40000 AND salary <= 70000;
+-- SELECT first_name, last_name, school, salary 
+-- FROM teachers 
+-- WHERE salary >= 40000 AND salary <= 70000;
 
-SELECT first_name
-FROM teachers
-WHERE first_name ILIKE 'sam%';
+-- SELECT first_name
+-- FROM teachers
+-- WHERE first_name ILIKE 'sam%';
 -- OBS: (LIKE/ILIKE -> case sensitive (Oi pessoal) / incase sensitive (oI PessOAl))
+
+-- SELECT *
+-- FROM teachers
+-- WHERE school = 'Myers Middle School' 
+--     OR salary < 40000;
+
+-- SELECT * 
+-- FROM teachers
+-- WHERE school = 'F.D. Roosevelt HS'
+--     AND (salary < 38000 OR salary > 40000);
+
+SELECT first_name, last_name, school, hire_date, salary
+FROM teachers
+WHERE school LIKE '%Roos%'
+ORDER BY hire_date DESC;
