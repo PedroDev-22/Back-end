@@ -1,0 +1,9 @@
+Question:
+-- 3. Imagine you're importing a file that contains a column with these values:
+      -- 17519.668
+      -- 20084.461
+      -- 18976.335
+-- Will a column in your target table with data type numeric(3,8) work for these
+-- values? Why or why not?
+
+It won't work, because the precision (3) is under the quantity of algarisms on the showed values. In this case, it will limit the quantity of algarisms on the value to 3. But the values have more than 3 algarisms, so it won't work.

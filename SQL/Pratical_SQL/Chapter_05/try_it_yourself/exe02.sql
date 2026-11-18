@@ -1,0 +1,9 @@
+-- Fiz no psql, o comando ficou assim:
+-- COPY (
+--     SELECT county_name, state_name, births_2019
+--     FROM us_counties_pop_est_2019
+--     ORDER BY births_2019 DESC
+--     LIMIT 20
+-- )
+-- TO 'Chapter_05/try_it_yourself/us_counties_most_births.csv'
+-- WITH (FORMAT CSV, HEADER);
