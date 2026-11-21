@@ -1,0 +1,2 @@
+title, artist, genre and release date at albums
+Title and composers at songs 
