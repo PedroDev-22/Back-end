@@ -1,0 +1,10 @@
+ALTER TABLE meat_poultry_egg_establishments RENAME TO
+meat_poultry_egg_establishments_temp;
+
+ALTER TABLE meat_poultry_egg_establishments_backup RENAME TO
+meat_poultry_egg_establishments;
+
+DROP TABLE meat_poultry_egg_establishments_temp;
+
+CREATE TABLE meat_poultry_egg_establishments_backup AS
+SELECT * FROM meat_poultry_egg_establishments;
